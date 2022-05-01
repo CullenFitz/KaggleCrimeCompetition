@@ -1,3 +1,8 @@
+% Author -- Cullen Fitzgerald
+
+% This file contains the final model used for the competition
+
+
 trainData = readtable("C:\Users\Cullen\Downloads\train.csv\train.csv");
 testData = readtable("C:\Users\Cullen\Downloads\test.csv\test.csv");
 
@@ -31,6 +36,7 @@ testData.ENCODINGS = encSeqTest;
 trainData = rmmissing(trainData);
 
 % Ok, now train classifier off of the embeddings for test data
+
 % This didn't work very well -- 60% accuracy -- Let's try something else
 
 A = cell2mat(trainData.ENCODINGS);
@@ -39,11 +45,13 @@ T = cell2mat(testData.ENCODINGS);
 trainData.ENCODINGS2 = A;
 testData.ENCODINGS2 = T;
 
+% Convert date data into strings 
 trainData.BEGDATE = datestr(trainData.BEGDATE);
 
+% Remove missing values (not optimal)
 trainNoMis = rmmissing(trainData);
 
-% Predict with Bagged Tree model
+% Predict with Bagged Tree model -- best model so far
 yfit = baggedTrees.predictFcn(testData);
 
 submission = testData;
