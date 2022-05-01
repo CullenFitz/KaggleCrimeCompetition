@@ -1,3 +1,13 @@
+"""
+Author: Cullen Fitzgerald
+
+Goal: Convert the narrative data to vectors and use these as features
+Result: My machine just wasn't powerful enough for this to be practical 
+"""
+
+
+
+
 # Dependencies
 
 import pandas as pd
