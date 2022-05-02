@@ -1,0 +1,100 @@
+---
+title: "R Kaggle Competition"
+output: html_notebook
+---
+
+
+
+```{r}
+library(tidyverse)
+library(tidytext)
+library(caret)
+library(tokenizers)
+library(dplyr)
+library(stopwords)
+library(lubridate)
+library(h2o)
+library(randomForest)
+library(lightgbm)
+```
+
+
+# Loading data
+```{r}
+crime_df = read.csv("C:/Users/Shishir Datum/Documents/School Files/4th Year/Semester 2/Data Science/Competition Files/train.csv")
+
+head(crime_df,10)
+```
+
+# Feature engineering
+Feature engineering applied with the narrative text
+
+```{r}
+df = unnest_tokens(crime_df, input=NARRATIVE, output=word)%>%
+  count(id, BEGDATE, X, Y, name = "frequency",CRIMETYPE)
+```
+
+Change the date time from 1/1/09 0:00 to m/d/y
+
+```{r}
+df$date = mdy_hm(df$BEGDATE)
+
+table(df$CRIMETYPE)
+
+tail(df)
+```
+Model with dummy coding to variables
+```{r}
+df$CRIMETYPE = ifelse(df$CRIMETYPE == "BTFV", 1,0)
+
+df$CRIMETYPE = as.factor(df$CRIMETYPE)
+
+table(df$CRIMETYPE)
+```
+
+
+```{r}
+test_df = read.csv("C:/Users/Shishir Datum/Documents/School Files/4th Year/Semester 2/Data Science/Competition Files/test.csv")
+
+head(df)
+
+head(test_df)
+```
+
+```{r}
+logit = glm(CRIMETYPE~ frequency+
+              date+ X+Y, data=df, family = 'binomial')
+
+summary(logit)
+```
+
+
+```{r}
+predicted = logit$y
+```
+
+
+## Custom model
+```{r}
+custom = trainControl(method = "repeatedcv",
+                      number = 10, repeats = 5, verboseIter = T)
+```
+
+
+## Linear model
+```{r results="hide"}
+set.seed(321)
+
+linear_model = lm(CRIMETYPE~ frequency+
+              X+Y, data=df)
+
+linear_model
+```
+
+
+```{r}
+rf = randomForest(CRIMETYPE ~ frequency + X + Y, data=df)
+
+print(rf)
+```
+
